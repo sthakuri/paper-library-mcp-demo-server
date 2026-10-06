@@ -1,0 +1,274 @@
+
+=== 1. Discovery: who are you, what can you do? ===
+-> {"jsonrpc": "2.0", "id": 1, "method": "server/discover", "params": {"_meta": "{...}"}}
+<- {
+  "cacheScope": "private",
+  "capabilities": {
+    "prompts": {
+      "listChanged": true
+    },
+    "resources": {
+      "listChanged": true,
+      "subscribe": true
+    },
+    "tools": {
+      "listChanged": true
+    }
+  },
+  "resultType": "complete",
+  "supportedVersions": [
+    "2026-07-28"
+  ],
+  "ttlMs": 0
+}
+
+=== 2. Tool discovery ===
+-> {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {"_meta": "{...}"}}
+<- {
+  "cacheScope": "private",
+  "resultType": "complete",
+  "tools": [
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search the seminar library by keyword in title, author, or tag. Returns matching paper ids.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "search_papersArguments"
+      },
+      "name": "search_papers",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Result",
+            "type": "array"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "search_papersOutput",
+        "type": "object"
+      },
+      "title": "Search Papers"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Save a short note on a paper in the library. Use the paper id from search_papers.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "paper_id": {
+            "title": "Paper Id",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          }
+        },
+        "required": [
+          "paper_id",
+          "note"
+        ],
+        "title": "add_noteArguments"
+      },
+      "name": "add_note",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "add_noteOutput",
+        "type": "object"
+      },
+      "title": "Add Note"
+    }
+  ],
+  "ttlMs": 0
+}
+
+=== 3. Resource discovery ===
+-> {"jsonrpc": "2.0", "id": 3, "method": "resources/list", "params": {"_meta": "{...}"}}
+<- {
+  "cacheScope": "private",
+  "resources": [
+    {
+      "description": "All papers in the seminar library, with any saved notes.",
+      "mimeType": "application/json",
+      "name": "reading-list",
+      "title": "Seminar Reading List",
+      "uri": "papers://reading-list"
+    }
+  ],
+  "resultType": "complete",
+  "ttlMs": 0
+}
+
+=== 4. Resource template discovery ===
+-> {"jsonrpc": "2.0", "id": 4, "method": "resources/templates/list", "params": {"_meta": "{...}"}}
+<- {
+  "cacheScope": "private",
+  "resourceTemplates": [
+    {
+      "description": "Details for one paper, by id.",
+      "mimeType": "application/json",
+      "name": "paper",
+      "title": "Paper Details",
+      "uriTemplate": "papers://{paper_id}"
+    }
+  ],
+  "resultType": "complete",
+  "ttlMs": 0
+}
+
+=== 5. Prompt discovery ===
+-> {"jsonrpc": "2.0", "id": 5, "method": "prompts/list", "params": {"_meta": "{...}"}}
+<- {
+  "cacheScope": "private",
+  "prompts": [
+    {
+      "arguments": [
+        {
+          "name": "paper_id",
+          "required": true
+        }
+      ],
+      "description": "Ask the model for a structured seminar-style critique.",
+      "name": "review_paper",
+      "title": "Review a Paper"
+    }
+  ],
+  "resultType": "complete",
+  "ttlMs": 0
+}
+
+=== 6. Read the resource (data/context) ===
+-> {"jsonrpc": "2.0", "id": 6, "method": "resources/read", "params": {"uri": "papers://reading-list", "_meta": "{...}"}}
+<- {
+  "cacheScope": "private",
+  "contents": [
+    {
+      "mimeType": "application/json",
+      "text": "[\n  {\n    \"id\": \"mcp-spec\",\n    \"title\": \"Model Context Protocol Specification (2026-07-28)\",\n    \"authors\": \"MCP maintainers\",\n    \"year\": 2026,\n    \"tags\": [\n      \"mcp\",\n      \"agents\",\n      \"protocol\"\n    ],\n    \"notes\": []\n  },\n  {\n    \"id\": \"react\",\n    \"title\": \"ReAct: Synergizing Reasoning and Acting in Language Models\",\n    \"authors\": \"Yao et al.\",\n    \"year\": 2023,\n    \"tags\": [\n      \"agents\",\n      \"tool use\",\n      \"reasoning\"\n    ],\n    \"notes\": []\n  },\n  {\n    \"id\": \"toolformer\",\n    \"title\": \"Toolformer: Language Models Can Teach Themselves to Use Tools\",\n    \"authors\": \"Schick et al.\",\n    \"year\": 2023,\n    \"tags\": [\n      \"tool use\",\n      \"function calling\"\n    ],\n    \"notes\": []\n  },\n  {\n    \"id\": \"rag\",\n    \"title\": \"Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks\",\n    \"authors\": \"Lewis et al.\",\n    \"year\": 2020,\n    \"tags\": [\n      \"rag\",\n      \"retrieval\"\n    ],\n    \"notes\": []\n  }\n]",
+      "uri": "papers://reading-list"
+    }
+  ],
+  "resultType": "complete",
+  "ttlMs": 0
+}
+
+=== 7. Call tool 1: search (action) ===
+-> {"jsonrpc": "2.0", "id": 7, "method": "tools/call", "params": {"name": "search_papers", "arguments": {"query": "tool use"}, "_meta": "{...}"}}
+<- {
+  "content": [
+    {
+      "text": "{\n  \"id\": \"react\",\n  \"title\": \"ReAct: Synergizing Reasoning and Acting in Language Models\",\n  \"year\": 2023\n}",
+      "type": "text"
+    },
+    {
+      "text": "{\n  \"id\": \"toolformer\",\n  \"title\": \"Toolformer: Language Models Can Teach Themselves to Use Tools\",\n  \"year\": 2023\n}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "resultType": "complete",
+  "structuredContent": {
+    "result": [
+      {
+        "id": "react",
+        "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+        "year": 2023
+      },
+      {
+        "id": "toolformer",
+        "title": "Toolformer: Language Models Can Teach Themselves to Use Tools",
+        "year": 2023
+      }
+    ]
+  }
+}
+
+=== 8. Call tool 2: add_note (state-changing action) ===
+-> {"jsonrpc": "2.0", "id": 8, "method": "tools/call", "params": {"name": "add_note", "arguments": {"paper_id": "react", "note": "Discuss in week 6"}, "_meta": "{...}"}}
+<- {
+  "content": [
+    {
+      "text": "Saved note #1 on 'ReAct: Synergizing Reasoning and Acting in Language Models'.",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "resultType": "complete",
+  "structuredContent": {
+    "result": "Saved note #1 on 'ReAct: Synergizing Reasoning and Acting in Language Models'."
+  }
+}
+
+=== 9. Tool error -> isError:true, model can self-correct ===
+-> {"jsonrpc": "2.0", "id": 9, "method": "tools/call", "params": {"name": "add_note", "arguments": {"paper_id": "gpt5", "note": "x"}, "_meta": "{...}"}}
+<- {
+  "content": [
+    {
+      "text": "Error executing tool add_note: Unknown paper id 'gpt5'. Valid ids: mcp-spec, react, toolformer, rag",
+      "type": "text"
+    }
+  ],
+  "isError": true,
+  "resultType": "complete"
+}
+
+=== 10. Read via template: note now appears ===
+-> {"jsonrpc": "2.0", "id": 10, "method": "resources/read", "params": {"uri": "papers://react", "_meta": "{...}"}}
+<- {
+  "cacheScope": "private",
+  "contents": [
+    {
+      "mimeType": "application/json",
+      "text": "{\n  \"id\": \"react\",\n  \"title\": \"ReAct: Synergizing Reasoning and Acting in Language Models\",\n  \"authors\": \"Yao et al.\",\n  \"year\": 2023,\n  \"tags\": [\n    \"agents\",\n    \"tool use\",\n    \"reasoning\"\n  ],\n  \"notes\": [\n    \"Discuss in week 6\"\n  ]\n}",
+      "uri": "papers://react"
+    }
+  ],
+  "resultType": "complete",
+  "ttlMs": 0
+}
+
+=== 11. Get prompt template ===
+-> {"jsonrpc": "2.0", "id": 11, "method": "prompts/get", "params": {"name": "review_paper", "arguments": {"paper_id": "rag"}, "_meta": "{...}"}}
+<- {
+  "description": "Ask the model for a structured seminar-style critique.",
+  "messages": [
+    {
+      "content": {
+        "text": "You are a discussant in a graduate seminar. Critique 'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks'.\nCover: (1) the problem, (2) the key idea, (3) evidence, (4) weaknesses, (5) two questions for the class. Keep it under 250 words.",
+        "type": "text"
+      },
+      "role": "user"
+    }
+  ],
+  "resultType": "complete"
+}
